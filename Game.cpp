@@ -23,9 +23,9 @@ void Game::run(){
 
 		 if (!m_paused){
 		 	sEnemySpawner();
+			sUserInput();
 			sMovement();
 			sCollision();
-			sUserInput();
 		 }
 		 sRender();
 
@@ -86,6 +86,22 @@ void Game::sEnemySpawner(){
 }
 
 void Game::sMovement(){
+	//Player movement;
+	m_player->cTransform->velocity.y = 0;
+	m_player->cTransform->velocity.x = 0;
+
+	if (m_player->cInput->up){
+		m_player->cTransform->velocity.y = -5;
+	}
+	if (m_player->cInput->down){
+		m_player->cTransform->velocity.y = 5;
+	}
+	if (m_player->cInput->left){
+		m_player->cTransform->velocity.x = -5;
+	}
+	if (m_player->cInput->right){
+		m_player->cTransform->velocity.x = 5;
+	}
 	auto entities = m_entityManager.getEntities();
 	for (auto& e : entities){
 		e->cTransform->pos.x += e->cTransform->velocity.x;
