@@ -42,3 +42,6 @@
 
 # vim ctags
 tags
+
+# temporary buffers
+*.swp

@@ -33,6 +33,10 @@ void Game::run(){
 	 }
 }
 
+void Game::setPaused(){
+	;
+}
+
 void Game::spawnPlayer(){
 	auto entity = m_entities.addEntity(player);
 	// to be changed to load the propertied from config.
@@ -56,4 +60,16 @@ void Game::spawnEnemy(){
 	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
 
 	m_lastEnemySpawnedTime = m_currentFrame;
+}
+
+void Game::spawnSmallEnemy(std::shared_ptr<Entity> entity){
+	;
+}
+
+void spawnBullet(std::shared_ptr<Entity>, const Vec2 & mouse_pos){
+	;
+}
+
+void spawnSpecialWeapon(std::shared_ptr<Entity> entity){
+	;
 }
