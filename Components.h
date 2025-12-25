@@ -26,15 +26,15 @@ class CTransform{
 
 class CShape{
 public:
-	sf::CircleShape circle;
-	;
-	CShape(float radius, int points, const sf::Color & fill, const sf::Color& outline, float thickness)
-		: circle(radius, points) {
+	sf::CircleShape polygon;
 
-			circle.setFillColor(fill);
-			circle.setOutlineColor(outline);
-			circle.setOutlineThickness(thickness);
-			circle.setOrigin(radius, radius);
+	CShape(float radius, int points, const sf::Color & fill, const sf::Color& outline, float thickness)
+		: polygon(radius, points) {
+
+			polygon.setFillColor(fill);
+			polygon.setOutlineColor(outline);
+			polygon.setOutlineThickness(thickness);
+			polygon.setOrigin(radius, radius);
 		}
 };
 

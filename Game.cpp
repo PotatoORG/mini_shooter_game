@@ -9,7 +9,7 @@ Game::Game(const std::string& configPath){
 void Game::init(const std::string& configPath){
 	// config reading to be done;
 
-	m_window.create(sf::VideoMode(1280, 720), "Polygon Shoots polygon");
+	m_window.create(sf::VideoMode(1280, 720), "Polygon Shoots Polygon");
 	m_window.setFramerateLimit(60);
 
 	spawnPlayer();
@@ -43,7 +43,7 @@ void Game::spawnPlayer(){
 	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
 
 	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
-
+	//entity->cShape->polygon.setPosition(entity->cTransform->pos.x, entity->cTransform->pos.x);
 	entity->cInput = std::make_shared<CInput>();
 
 	m_player = entity;
@@ -78,7 +78,13 @@ void Game::sEnemySpawner(){
 }
 
 void Game::sMovement(){
-	;
+	auto entities = m_entityManager.getEntities();
+	for (auto& e : entities){
+		e->cTransform->pos.x += e->cTransform->velocity.x;
+		e->cTransform->pos.y += e->cTransform->velocity.y;
+
+		e->cTransform->angle += 1.0f;
+	}
 }
 
 void Game::sCollision(){
@@ -88,4 +94,14 @@ void Game::sUserInput(){
 }
 
 void Game::sRender(){
+	m_window.clear();
+	auto entities = m_entityManager.getEntities();
+	for (auto& e : entities){
+		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.x);
+
+		
+		e->cShape->polygon.setRotation(e->cTransform->angle);
+		m_window.draw(e->cShape->polygon);
+	}
+	m_window.display();
 }
