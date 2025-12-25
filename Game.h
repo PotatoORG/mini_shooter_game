@@ -21,7 +21,7 @@ class Game{
 	BulletConfig 	 m_bulletConfig;
 	int 			 m_score = 0;
 	int 			 m_lastEnemySpawnedTime = 0;
-	int 			 m_currentFrame;
+	int 			 m_currentFrame = 0;
 	bool 			 m_paused = false;
 	bool 			 m_running = true;
 

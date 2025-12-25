@@ -46,18 +46,21 @@ void Game::spawnPlayer(){
 	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
 	entity->cInput = std::make_shared<CInput>();
 
-	m_player = entity;
+	m_player = entity; // Should not be allowed in ECS, but we are just doing it for some convinience.
 }
 
+// intitializes an enemy entity when called
 void Game::spawnEnemy(){
 	auto entity = m_entityManager.addEntity(enemy);
 
 	float ex = rand() % m_window.getSize().x;
 	float ey = rand() % m_window.getSize().y;
+	float eAngle = rand() % 360;
 
-	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0, 0), 0.0f);
+	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0, 0), eAngle);
 
 	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
+	std::cout << "Enemy spawned at (" << ex << ", " << ey << ")\n";
 
 	m_lastEnemySpawnedTime = m_currentFrame;
 }
@@ -75,6 +78,11 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 }
 
 void Game::sEnemySpawner(){
+	// will decide when to spawn an enemy and call the spawnEnemy function to spawn the enemy.
+	size_t spawnInterval = 50; // Number of frames after to spawn an enemy, temparory var until SI implemented.
+	if (spawnInterval <= m_currentFrame - m_lastEnemySpawnedTime){
+		spawnEnemy();
+	}
 }
 
 void Game::sMovement(){
@@ -97,7 +105,7 @@ void Game::sRender(){
 	m_window.clear();
 	auto entities = m_entityManager.getEntities();
 	for (auto& e : entities){
-		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.x);
+		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
 		
 		e->cShape->polygon.setRotation(e->cTransform->angle);
