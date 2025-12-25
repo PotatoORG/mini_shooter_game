@@ -1,3 +1,4 @@
+Only speeds are supposed to be float
 Window W H FL FS
 FL is frame limit
 FS determines whether the application is full screen (1) or not (0)

@@ -2,7 +2,13 @@
 #include <cmath>
 #include <iostream>
 
+
 Vec2::Vec2() {}
+
+Vec2::Vec2(float vec[2]){
+	x = vec[0];
+	y = vec[1];
+}
 
 Vec2::Vec2(float xin, float yin)
 	: x (xin)
@@ -20,6 +26,7 @@ bool Vec2::operator != (const Vec2& rhs) const{
 Vec2 Vec2::operator + (const Vec2& rhs) const{
 	return Vec2(x + rhs.x, y + rhs.y);
 }
+
 
 Vec2 Vec2::operator - (const Vec2& rhs) const{
 	return Vec2(x - rhs.x, y - rhs.y);

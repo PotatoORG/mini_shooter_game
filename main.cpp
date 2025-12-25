@@ -11,5 +11,11 @@ int main(){
 	vec2.print();
 	Vec2 vec1 = vec2*3 + vec*2;
 	vec1.print();
+
+	Vec2 v3 = Vec2({3.0, 4.1});
+	v3.print();
+
+	Vec2 v4 = {2.0, 1.4};
+	v4.print();
 	return 0;
 }

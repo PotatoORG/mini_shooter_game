@@ -7,6 +7,7 @@ public:
 
 	Vec2();
 	Vec2(float xin, float yin);
+	Vec2(float vec[2]);
 
 	bool operator == (const Vec2& rhs) const;
 	bool operator != (const Vec2& rhs) const;
