@@ -99,6 +99,101 @@ void Game::sCollision(){
 }
 
 void Game::sUserInput(){
+	sf::Event event;
+	while (m_window.pollEvent(event)){
+		if (event.type == sf::Event::Closed){
+			m_running = false;
+		}
+
+		if (event.type == sf::Event::KeyPressed){
+			switch (event.key.code){
+				case sf::Keyboard::W:
+					std::cout << "W pressed\n";
+					m_player->cInput->up = true;
+					break;
+				case sf::Keyboard::A:
+					std::cout << "A pressed\n";
+					m_player->cInput->left = true;
+					break;
+				case sf::Keyboard::S:
+					std::cout << "S pressed\n";
+					m_player->cInput->down = true;
+					break;
+				case sf::Keyboard::D:
+					std::cout << "D pressed\n";
+					m_player->cInput->right = true;
+					break;
+				case sf::Keyboard::K:
+					std::cout << "K pressed\n";
+					m_player->cInput->shoot = true;
+					break;
+				case sf::Keyboard::J:
+					std::cout << "J pressed\n";
+					m_player->cInput->special = true;
+					break;
+			}
+		}
+
+		if (event.type == sf::Event::KeyReleased){
+			switch (event.key.code){
+				case sf::Keyboard::W:
+					std::cout << "W released\n";
+					m_player->cInput->up = false;
+					break;
+				case sf::Keyboard::A:
+					std::cout << "A released\n";
+					m_player->cInput->left = false;
+					break;
+				case sf::Keyboard::S:
+					std::cout << "S released\n";
+					m_player->cInput->down = false;
+					break;
+				case sf::Keyboard::D:
+					std::cout << "D released\n";
+					m_player->cInput->right = false;
+					break;
+				case sf::Keyboard::K:
+					std::cout << "K released\n";
+					m_player->cInput->shoot = false;
+					break;
+				case sf::Keyboard::J:
+					std::cout << "J released\n";
+					m_player->cInput->special = false;
+					break;
+			}
+		}
+
+		if (event.type == sf::Event::MouseButtonPressed){
+			m_player->cInput->aim.x = event.mouseButton.x;
+			m_player->cInput->aim.y = event.mouseButton.y;
+			std::cout << "Clicked at (" << m_player->cInput->aim.x << ", " << event.mouseButton.y << ")\n";
+
+			switch (event.mouseButton.button){
+				case sf::Mouse::Left:
+					std::cout << "Mouse Left Clicked\n";
+					m_player->cInput->shoot = true;
+					break;
+				case sf::Mouse::Right:
+					std::cout << "Mouse Right Clicked\n";
+					m_player->cInput->shoot = true;
+					break;
+			}
+		}
+
+		if (event.type == sf::Event::MouseButtonReleased){
+			switch (event.mouseButton.button){
+				case sf::Mouse::Left:
+					std::cout << "Mouse Left Released\n";
+					m_player->cInput->shoot = false;
+					break;
+				case sf::Mouse::Right:
+					std::cout << "Mouse Right Released\n";
+					m_player->cInput->shoot = false;
+					break;
+			}
+
+		}
+	}
 }
 
 void Game::sRender(){
