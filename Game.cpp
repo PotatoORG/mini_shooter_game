@@ -37,13 +37,13 @@ void Game::setPaused(){
 	;
 }
 
+// initializes the player entity, its transform, shape;
 void Game::spawnPlayer(){
 	auto entity = m_entityManager.addEntity(player);
 	// to be changed to load the propertied from config.
 	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
 
 	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
-	//entity->cShape->polygon.setPosition(entity->cTransform->pos.x, entity->cTransform->pos.x);
 	entity->cInput = std::make_shared<CInput>();
 
 	m_player = entity;
