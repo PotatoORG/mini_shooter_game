@@ -79,10 +79,15 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 
 void Game::sEnemySpawner(){
 	// will decide when to spawn an enemy and call the spawnEnemy function to spawn the enemy.
-	size_t spawnInterval = 50; // Number of frames after to spawn an enemy, temparory var until SI implemented.
+	size_t spawnInterval = 100; // Number of frames after to spawn an enemy, temparory var until SI implemented.
 	if (spawnInterval <= m_currentFrame - m_lastEnemySpawnedTime){
 		spawnEnemy();
 	}
+	/*
+	static bool spawned = false;
+	if (!spawned){ spawnEnemy(); spawnEnemy(); spawned = true;}
+	*/
+
 }
 
 void Game::sMovement(){
@@ -102,6 +107,7 @@ void Game::sMovement(){
 	if (m_player->cInput->right){
 		m_player->cTransform->velocity.x = 5;
 	}
+
 	auto entities = m_entityManager.getEntities();
 	for (auto& e : entities){
 		e->cTransform->pos.x += e->cTransform->velocity.x;
@@ -111,9 +117,20 @@ void Game::sMovement(){
 	}
 }
 
+
+// This will detect player's collision with any enemy or bullet's collision with any enemy and call the required functions to proceed.
 void Game::sCollision(){
+	auto enemies = m_entityManager.getEntities(enemy);
+
+	for (auto& enemy : enemies){
+		float separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
+		if (separation <= (m_player->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
+			std::cout << "Player collision distance = " << separation << "\n";
+		}
+	}
 }
 
+// This system is suppose to take user input and convert it into the game interface variables, player's cInput components.
 void Game::sUserInput(){
 	sf::Event event;
 	while (m_window.pollEvent(event)){

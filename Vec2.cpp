@@ -52,8 +52,8 @@ void Vec2::operator *= (const float& rhs){
 	y *= rhs;
 }
 
-float Vec2::dist(const Vec2& a, const Vec2& b) const{
-	return std::sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+float Vec2::distance(const Vec2& a) const{
+	return std::sqrt((a.x - x)*(a.x - x) + (a.y - y)*(a.y - y));
 }
 
 float Vec2::length() const{

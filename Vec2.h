@@ -20,7 +20,7 @@ public:
 	void operator -= (const Vec2& rhs);
 	void operator *= (const float& rhs);
 
-	float dist(const Vec2& a, const Vec2& b) const;
+	float distance(const Vec2& a) const;
 
 	float length() const;
 	
