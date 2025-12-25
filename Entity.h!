@@ -1,5 +1,0 @@
-class Entity{
-	size_t m_id;
-	size_t m_tag;
-	bool m_alive = true;
-};

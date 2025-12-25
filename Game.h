@@ -1,16 +1,21 @@
 #ifndef GAME_H
 #define GAME_H
-#include <SFML/Graphics.hpp>
 
-struct PlayerConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V, float S};
-struct EnemyConfig{int SR, CR, OR, OG, OB, OT, VMIN, VMAX, SI, float SMIN, SMAX};
-struct BulletConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V, L, float S};
+#include <SFML/Graphics.hpp>
+#include <memory>
+
+#include "EntityManager.h"
+
+
+struct PlayerConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V; float S;};
+struct EnemyConfig{int SR, CR, OR, OG, OB, OT, VMIN, VMAX, SI; float SMIN, SMAX;};
+struct BulletConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V, L; float S;};
 
 class Game{
 	sf::RenderWindow m_window;
-	EntityManager 	 m_entities;
+	EntityManager 	 m_entityManager;
 	sf::Font 		 m_font;
-	sf::text 		 m_text;
+	sf::Text 		 m_text;
 	PlayerConfig	 m_playerConfig;
 	EnemyConfig 	 m_enemyConfig;
 	BulletConfig 	 m_bulletConfig;
@@ -23,7 +28,7 @@ class Game{
 	std::shared_ptr<Entity> m_player;
 
 	void init(const std::string& configPath);
-	void setPaused(bool paused);
+	void setPaused();
 
 	void sMovement(); // System : Entity movement/position update;
 	void sUserInput();
@@ -39,7 +44,7 @@ class Game{
 	void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
 
 public:
-	Game(std::string& configPath);
+	Game(const std::string& configPath);
 
 	void run();
 };

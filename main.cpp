@@ -1,4 +1,5 @@
 #include "Vec2.h"
+#include "Game.h"
 
 int main(){
 	Vec2 vec(3.0, 4.5);
@@ -17,5 +18,10 @@ int main(){
 
 	Vec2 v4 = {2.0, 1.4};
 	v4.print();
+
+	Game game("lol");
+	game.run();
+
+
 	return 0;
 }

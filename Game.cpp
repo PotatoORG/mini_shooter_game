@@ -19,7 +19,7 @@ void Game::run(){
 	// add pause functionality here;;
 	//
 	 while (m_running){
-		 m_entities.update();
+		 m_entityManager.update();
 
 		 if (!m_paused){
 		 	sEnemySpawner();
@@ -38,11 +38,11 @@ void Game::setPaused(){
 }
 
 void Game::spawnPlayer(){
-	auto entity = m_entities.addEntity(player);
+	auto entity = m_entityManager.addEntity(player);
 	// to be changed to load the propertied from config.
 	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
 
-	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color::(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
+	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
 
 	entity->cInput = std::make_shared<CInput>();
 
@@ -50,12 +50,12 @@ void Game::spawnPlayer(){
 }
 
 void Game::spawnEnemy(){
-	auto entity = std::make_shared<Entity>(enemy);
+	auto entity = m_entityManager.addEntity(enemy);
 
 	float ex = rand() % m_window.getSize().x;
 	float ey = rand() % m_window.getSize().y;
 
-	entity->cTransform = std::make_shared<CTransform>({ex, ey}, {0, 0}, 0.0f);
+	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0, 0), 0.0f);
 
 	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
 
@@ -66,10 +66,26 @@ void Game::spawnSmallEnemy(std::shared_ptr<Entity> entity){
 	;
 }
 
-void spawnBullet(std::shared_ptr<Entity>, const Vec2 & mouse_pos){
+void Game::spawnBullet(std::shared_ptr<Entity>, const Vec2 & mouse_pos){
 	;
 }
 
-void spawnSpecialWeapon(std::shared_ptr<Entity> entity){
+void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 	;
+}
+
+void Game::sEnemySpawner(){
+}
+
+void Game::sMovement(){
+	;
+}
+
+void Game::sCollision(){
+}
+
+void Game::sUserInput(){
+}
+
+void Game::sRender(){
 }

@@ -3,6 +3,17 @@
 #include "Vec2.h"
 #include <SFML/Graphics.hpp>
 
+#ifndef ENUM_CTAG
+#define ENUM_CTAG
+enum CTag{
+	default_tag,
+	bullet,
+	enemy,
+	player,
+	enemy_small
+};
+#endif
+
 class CTransform{
 	public:
 		Vec2 pos = {0.0, 0.0};
@@ -39,7 +50,7 @@ class CScore{
 public:
 	float score;
 	CScore(float score)
-		: score (score); {}
+		: score (score) {}
 };
 
 class CLifeSpan{

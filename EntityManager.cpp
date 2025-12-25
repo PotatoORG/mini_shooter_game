@@ -1,23 +1,29 @@
 #include "Entity.h"
+#include "EntityManager.h"
 
 EntityManager::EntityManager() {}
 
-std::shared_ptr<Entity> EntityManager::addEntity(const Ctag& tag){
+std::shared_ptr<Entity> EntityManager::addEntity(const CTag& tag){
 	auto entity = std::make_shared<Entity>(m_totalEntities, tag);
-	m_entities.pushback(entity);
-	m_entityMap[tag].pushback(entity);
+	m_entities.push_back(entity);
+	m_entityMap[tag].push_back(entity);
 
 	return entity;
 }
 
-EntityVec EntityManager::getEntities();
-EntityVec EntityManager::getEntities(Ctag tag);
+EntityVec& EntityManager::getEntities(){
+	return m_entities;
+}
+
+EntityVec& EntityManager::getEntities(CTag tag){
+	return m_entityMap[tag];
+}
 
 // update function is supposed to be called by the game at start of each frame to update the added entities
 void EntityManager::update(){
-	for (auto& e : m_toAdd){
-		m_entities.pushback(e);
-		m_entityMap[e->m_tag].pushback(e);
+	for (auto e : m_toAdd){
+		m_entities.push_back(e);
+		m_entityMap[e->tag()].push_back(e);
 	}
 	m_toAdd.clear();
 }
