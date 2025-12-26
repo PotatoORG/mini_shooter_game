@@ -74,13 +74,19 @@ void Game::setPaused(){
 // initializes the player entity, its transform, shape;
 void Game::spawnPlayer(){
 	auto entity = m_entityManager.addEntity(player);
-	// to be changed to load the propertied from config.
+
+	// position where the player will be spawned
 	auto cx = m_window.getSize().x/2;
 	auto cy = m_window.getSize().y/2;
 
-	entity->cTransform = std::make_shared<CTransform>(Vec2(cx, cy), Vec2(0, 0), 0.0f);
+	Vec2 velocity = {0, 0}; // Random init. Doesn't matters;
 
-	entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.CR, sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB), sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB), m_playerConfig.OT);
+	entity->cTransform = std::make_shared<CTransform>(Vec2(cx, cy), velocity, 0.0f);
+
+	auto fillColor = sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB);
+	auto outlineColor = sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB);
+
+	entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.CR, fillColor, outlineColor, m_playerConfig.OT);
 
 	entity->cInput = std::make_shared<CInput>();
 
@@ -91,22 +97,27 @@ void Game::spawnPlayer(){
 void Game::spawnEnemy(){
 	auto entity = m_entityManager.addEntity(enemy);
 
-	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
+	float 	ex, ey;
+	auto 	outlineColor = sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB);
+	auto 	fillColor 	 = sf::Color(rand()%255, rand()%255, rand()%255); // Random Color
+	int 	vertices 	 = m_enemyConfig.VMIN + rand() % (int)(m_enemyConfig.VMAX - m_enemyConfig.VMIN);
+	float 	minDistance  = m_player->cShape->polygon.getRadius() + entity->cShape->polygon.getRadius() + 10; // Minimum allowed initial separation between player and spawned enemy.
+	auto 	speed 		 = m_enemyConfig.SMIN + rand() % (int)(m_enemyConfig.SMAX - m_enemyConfig.SMIN);
+	float 	theta 		 = rand() % 360;
 
-	float ex, ey;
-	float minDistance = m_player->cShape->polygon.getRadius() + entity->cShape->polygon.getRadius() + 10;
+	entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, vertices, fillColor, outlineColor, m_enemyConfig.OT);
+
+	Vec2 velocity = {std::cos(theta), std::sin(theta)};
+	velocity *= speed;
 
 	do{
-		ex = rand() % m_window.getSize().x;
-		ey = rand() % m_window.getSize().y;
+		ex = rand() % (int)(m_window.getSize().x - 2*entity->cShape->polygon.getRadius());
+		ey = rand() % (int)(m_window.getSize().y - 2*entity->cShape->polygon.getRadius());
 	} while (Vec2(ex, ey).distance(m_player->cTransform->pos) <= minDistance);
 
-	float eAngle = rand() % 360;
-
-	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0, 0), eAngle);
+	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), velocity, theta);
 
 	std::cout << "Enemy spawned at (" << ex << ", " << ey << ")\n";
-
 	m_lastEnemySpawnedTime = m_currentFrame;
 }
 
@@ -188,7 +199,7 @@ void Game::sMovement(){
 		e->cTransform->pos.x += e->cTransform->velocity.x;
 		e->cTransform->pos.y += e->cTransform->velocity.y;
 
-		e->cTransform->angle += 1.0f;
+		e->cTransform->angle += 2.0f;
 	}
 }
 
