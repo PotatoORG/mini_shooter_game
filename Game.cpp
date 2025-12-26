@@ -248,6 +248,7 @@ void Game::sCollision(){
 		}
 	}
 
+	// Enemy wall collision
 	for (auto& enemy : enemies){
 		auto radius = m_enemyConfig.SR;
 		if (enemy->cTransform->pos.x < radius){
@@ -263,6 +264,20 @@ void Game::sCollision(){
 			enemy->cTransform->velocity.y *= -1;
 		}
 
+	}
+
+	auto radius = m_player->cShape->polygon.getRadius();
+	if (m_player->cTransform->pos.x < radius){
+		m_player->cTransform->pos.x = radius;
+	}
+	if (m_player->cTransform->pos.x > m_window.getSize().x - radius){
+		m_player->cTransform->pos.x = m_window.getSize().x - radius;
+	}
+	if (m_player->cTransform->pos.y < radius){
+		m_player->cTransform->pos.y = radius;
+	}
+	if (m_player->cTransform->pos.y > m_window.getSize().y - radius){
+		m_player->cTransform->pos.y = m_window.getSize().y - radius;
 	}
 }
 
