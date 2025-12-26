@@ -6,7 +6,7 @@
 EntityManager::EntityManager() {}
 
 std::shared_ptr<Entity> EntityManager::addEntity(const CTag& tag){
-	auto entity = std::make_shared<Entity>(m_totalEntities, tag);
+	auto entity = std::make_shared<Entity>(m_totalEntities++, tag);
 	m_entities.push_back(entity);
 	m_entityMap[tag].push_back(entity);
 
@@ -32,15 +32,25 @@ void EntityManager::update(){
 }
 
 void EntityManager::removeDeadEntities(){
+	//std::cout << "Searching for dead entities...\n";
 	for (auto it = m_entities.begin(); it != m_entities.end();){
 		if (!(*it)->isAlive()){
 			auto idToRemove = (*it)->id();
 			auto entityTag = (*it)->tag();
-			auto entity = *it;
+			//auto entity = *it;
 
 			it = m_entities.erase(it);
+			std::cout << idToRemove << " Entity removed from the big vector\n";
 
-			m_entityMap[entityTag].erase(find(m_entityMap[entityTag].begin(), m_entityMap[entityTag].begin(), entity));
+			for (auto it2 = m_entityMap[entityTag].begin(); it2 != m_entityMap[entityTag].end();){
+				if ((*it2)->id() == idToRemove){
+					it2 = m_entityMap[entityTag].erase(it2);
+					std::cout << idToRemove << " Entity removed from the map vector\n";
+				} else {
+					it2++;
+				}
+			}
+			//m_entityMap[entityTag].erase(find(m_entityMap[entityTag].begin(), m_entityMap[entityTag].begin(), entity));
 			//m_entityMap[entityTag].erase(entity);
 		} else {
 			it++;
