@@ -9,7 +9,7 @@ S - font sizw
 r,g,b - font color
 
 Player Specification
-Player SR CR S FR FG FB OR OG OT V
+Player SR CR S FR FG FB OR OG OB OT V
 SR - Shape Radius
 CR - Collision Radius
 S - Speed

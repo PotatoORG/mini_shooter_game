@@ -101,7 +101,6 @@ void Game::spawnEnemy(){
 	auto 	outlineColor = sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB);
 	auto 	fillColor 	 = sf::Color(rand()%255, rand()%255, rand()%255); // Random Color
 	int 	vertices 	 = m_enemyConfig.VMIN + rand() % (int)(m_enemyConfig.VMAX - m_enemyConfig.VMIN);
-	float 	minDistance  = m_player->cShape->polygon.getRadius() + entity->cShape->polygon.getRadius() + 10; // Minimum allowed initial separation between player and spawned enemy.
 	auto 	speed 		 = m_enemyConfig.SMIN + rand() % (int)(m_enemyConfig.SMAX - m_enemyConfig.SMIN);
 	float 	theta 		 = rand() % 360;
 
@@ -110,6 +109,7 @@ void Game::spawnEnemy(){
 	Vec2 velocity = {std::cos(theta), std::sin(theta)};
 	velocity *= speed;
 
+	float 	minDistance  = m_player->cShape->polygon.getRadius() + entity->cShape->polygon.getRadius() + 10; // Minimum allowed initial separation between player and spawned enemy.
 	do{
 		ex = rand() % (int)(m_window.getSize().x - 2*entity->cShape->polygon.getRadius());
 		ey = rand() % (int)(m_window.getSize().y - 2*entity->cShape->polygon.getRadius());
@@ -129,7 +129,11 @@ void Game::spawnBullet(const Vec2 & mousePos){
 	auto b = m_entityManager.addEntity(bullet);
 	//b->cTransform->pos = m_player->cTransform->pos;
 	b->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, Vec2(0, 0), 0.0f);
-	b->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
+
+	auto fillColor = sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB);
+	auto outlineColor = sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB);
+
+	b->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, fillColor, outlineColor, m_bulletConfig.OT);
 
 	float speed = m_bulletConfig.S;
 
@@ -212,12 +216,15 @@ void Game::sAttack(){
 
 
 // This will detect player's collision with any enemy or bullet's collision with any enemy and call the required functions to proceed.
+// And collision of enemies with walls of window and will deflect them back if they do so
 void Game::sCollision(){
 
 	auto enemies = m_entityManager.getEntities(enemy);
 	auto bullets = m_entityManager.getEntities(bullet);
 
 	float separation;
+
+	// Player - Enemy collision checker
 	for (auto& enemy : enemies){
 
 		separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
@@ -228,8 +235,9 @@ void Game::sCollision(){
 		}
 	}
 
-	enemies = m_entityManager.getEntities(enemy);
+	enemies = m_entityManager.getEntities(enemy); // since reset_game function may cause vector to reallocate.
 
+	// Bullet - enemy collision checker
 	for (auto& bullet : bullets){
 		for (auto& enemy : enemies){
 			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
@@ -238,6 +246,23 @@ void Game::sCollision(){
 				enemy->destroy();
 			}
 		}
+	}
+
+	for (auto& enemy : enemies){
+		auto radius = m_enemyConfig.SR;
+		if (enemy->cTransform->pos.x < radius){
+			enemy->cTransform->velocity.x *= -1;
+		}
+		if (enemy->cTransform->pos.x > m_window.getSize().x - radius){
+			enemy->cTransform->velocity.x *= -1;
+		}
+		if (enemy->cTransform->pos.y < radius){
+			enemy->cTransform->velocity.y *= -1;
+		}
+		if (enemy->cTransform->pos.y > m_window.getSize().y - radius){
+			enemy->cTransform->velocity.y *= -1;
+		}
+
 	}
 }
 
