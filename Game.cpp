@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "Game.h"
 
 #include <iostream>
@@ -26,6 +28,7 @@ void Game::run(){
 		 	sEnemySpawner();
 			sUserInput();
 			sMovement();
+			sAttack();
 			sCollision();
 		 }
 		 sRender();
@@ -70,8 +73,21 @@ void Game::spawnSmallEnemy(std::shared_ptr<Entity> entity){
 	;
 }
 
-void Game::spawnBullet(std::shared_ptr<Entity>, const Vec2 & mouse_pos){
-	;
+void Game::spawnBullet(const Vec2 & mousePos){
+	auto b = m_entityManager.addEntity(bullet);
+	//b->cTransform->pos = m_player->cTransform->pos;
+	b->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, Vec2(0, 0), 0.0f);
+	b->cShape = std::make_shared<CShape>(16.0f, 9, sf::Color(123, 88, 34), sf::Color(255, 255, 255), 4.0f);
+
+	float speed = 6.0f;
+
+	auto dy = mousePos.y - b->cTransform->pos.y;
+	auto dx = mousePos.x - b->cTransform->pos.x;
+
+	auto theta = std::atan2(dy, dx);
+
+	b->cTransform->velocity = {std::cos(theta), std::sin(theta)};
+	b->cTransform->velocity *= speed;
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
@@ -84,6 +100,11 @@ void Game::resetGame(){
 	auto& enemies = m_entityManager.getEntities(enemy);
 	for (auto& enemy : enemies){
 		enemy->destroy();
+	}
+
+	auto& bullets = m_entityManager.getEntities(bullet);
+	for (auto& bullet : bullets){
+		bullet->destroy();
 	}
 }
 
@@ -124,6 +145,13 @@ void Game::sMovement(){
 		e->cTransform->pos.y += e->cTransform->velocity.y;
 
 		e->cTransform->angle += 1.0f;
+	}
+}
+
+// Checks user input and shoots bullets or do special attack accordingly
+void Game::sAttack(){
+	if (m_player->cInput->shoot){
+		spawnBullet(m_player->cInput->aim);
 	}
 }
 
