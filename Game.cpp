@@ -20,6 +20,7 @@ void Game::run(){
 	//
 	 while (m_running){
 		 m_entityManager.update();
+		 m_entityManager.removeDeadEntities();
 
 		 if (!m_paused){
 		 	sEnemySpawner();
@@ -77,6 +78,15 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 	;
 }
 
+void Game::resetGame(){
+	m_player->cTransform->pos = {200.0f, 200.0f};
+	m_score = 0;
+	auto& enemies = m_entityManager.getEntities(enemy);
+	for (auto& enemy : enemies){
+		enemy->destroy();
+	}
+}
+
 void Game::sEnemySpawner(){
 	// will decide when to spawn an enemy and call the spawnEnemy function to spawn the enemy.
 	size_t spawnInterval = 100; // Number of frames after to spawn an enemy, temparory var until SI implemented.
@@ -126,6 +136,7 @@ void Game::sCollision(){
 		float separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
 		if (separation <= (m_player->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
 			std::cout << "Player collision distance = " << separation << "\n";
+			resetGame(); // resets score, position of player and enemies
 		}
 	}
 }

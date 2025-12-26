@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Entity.h"
 #include "EntityManager.h"
 
@@ -26,5 +28,23 @@ void EntityManager::update(){
 		m_entityMap[e->tag()].push_back(e);
 	}
 	m_toAdd.clear();
+}
+
+void EntityManager::removeDeadEntities(){
+	for (auto it = m_entities.begin(); it != m_entities.end();){
+		if (!(*it)->isAlive()){
+			auto idToRemove = (*it)->id();
+			auto entityTag = (*it)->tag();
+			auto entity = *it;
+
+			it = m_entities.erase(it);
+
+			m_entityMap[entityTag].erase(find(m_entityMap[entityTag].begin(), m_entityMap[entityTag].begin(), entity));
+			//m_entityMap[entityTag].erase(entity);
+		} else {
+			it++;
+		}
+	}
+	std::cout << "Number of entities left: " << m_entities.size() << "\n";
 }
 
