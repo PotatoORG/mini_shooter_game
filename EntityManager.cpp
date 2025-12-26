@@ -22,6 +22,7 @@ EntityVec& EntityManager::getEntities(CTag tag){
 }
 
 // update function is supposed to be called by the game at start of each frame to update the added entities
+// and to update lifespan of all the entities which have lifespan. 
 void EntityManager::update(){
 	for (auto e : m_toAdd){
 		m_entities.push_back(e);

@@ -23,6 +23,7 @@ void Game::run(){
 	 while (m_running){
 		 m_entityManager.update();
 		 m_entityManager.removeDeadEntities();
+		 sLifeSpan();
 
 		 if (!m_paused){
 		 	sEnemySpawner();
@@ -88,6 +89,8 @@ void Game::spawnBullet(const Vec2 & mousePos){
 
 	b->cTransform->velocity = {std::cos(theta), std::sin(theta)};
 	b->cTransform->velocity *= speed;
+
+	b->cLifeSpan = std::make_shared<CLifeSpan>(100);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
@@ -247,7 +250,7 @@ void Game::sUserInput(){
 					break;
 				case sf::Mouse::Right:
 					std::cout << "Mouse Right Clicked\n";
-					m_player->cInput->shoot = true;
+					m_player->cInput->special = true;
 					break;
 			}
 		}
@@ -260,7 +263,7 @@ void Game::sUserInput(){
 					break;
 				case sf::Mouse::Right:
 					std::cout << "Mouse Right Released\n";
-					m_player->cInput->shoot = false;
+					m_player->cInput->special = false;
 					break;
 			}
 
@@ -279,4 +282,13 @@ void Game::sRender(){
 		m_window.draw(e->cShape->polygon);
 	}
 	m_window.display();
+}
+
+void Game::sLifeSpan(){
+	auto bullets = m_entityManager.getEntities(bullet);
+	for (auto& bullet : bullets){
+		if(!bullet->cLifeSpan->remaining--){
+			bullet->destroy();
+		}
+	}
 }
