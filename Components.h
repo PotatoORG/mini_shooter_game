@@ -10,7 +10,8 @@ enum CTag{
 	bullet,
 	enemy,
 	player,
-	enemy_small
+	enemy_small,
+	text
 };
 #endif
 

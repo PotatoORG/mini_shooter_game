@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "Game.h"
 
@@ -38,8 +39,15 @@ void Game::init(const std::string& configPath){
 
 	}
 
+	if (!m_font.loadFromFile(m_fontConfig.F)){
+		std::cerr << "Font file : " << m_fontConfig.F << " not found.\n";
+		std::exit(0);
+	}
+	m_text.setFont(m_font);
+	m_text.setString("Score -_- '");
 	m_window.create(sf::VideoMode(m_windowConfig.W, m_windowConfig.H), "Polygon Shoots Polygon");
 	m_window.setFramerateLimit(m_windowConfig.FL);
+
 
 	m_bulletConfig.S = 10.0f;
 	spawnPlayer();
@@ -242,6 +250,7 @@ void Game::sCollision(){
 		for (auto& enemy : enemies){
 			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
 			if (separation <= (bullet->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
+				m_score++;
 				bullet->destroy();
 				enemy->destroy();
 			}
@@ -390,6 +399,10 @@ void Game::sRender(){
 		e->cShape->polygon.setRotation(e->cTransform->angle);
 		m_window.draw(e->cShape->polygon);
 	}
+
+	m_text.setString("Score : " + std::to_string(m_score));
+	m_window.draw(m_text);
+
 	m_window.display();
 }
 
