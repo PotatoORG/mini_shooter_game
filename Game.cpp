@@ -17,49 +17,23 @@ void Game::init(const std::string& configPath){
 	while (conf >> temp){
 		if (temp == "Window"){
 			conf >> m_windowConfig.W >> m_windowConfig.H >> m_windowConfig.FL >> m_windowConfig.FS;
+			std::cout << "Window config read\n";
 		}
 		if (temp == "Font"){
 			conf >> m_fontConfig.F >> m_fontConfig.S >> m_fontConfig.R >> m_fontConfig.G >> m_fontConfig.B;
+			std::cout << "Font config read\n";
 		}
 		if (temp == "Player"){
-			conf >> m_playerConfig.SR \
-				>> m_playerConfig.CR \
-				>> m_playerConfig.S \
-				>> m_playerConfig.FR \
-				>> m_playerConfig.FG \
-				>> m_playerConfig.FB \
-				>> m_playerConfig.OR \
-				>> m_playerConfig.OG \
-				>> m_playerConfig.OB \
-				>> m_playerConfig.OT \
-				>> m_playerConfig.V;
+			conf >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.S >> m_playerConfig.FR >> m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> m_playerConfig.V;
+			std::cout << "Player config read\n";
 		}
 		if (temp == "Enemy"){
-			conf >> m_enemyConfig.SR \
-				>> m_enemyConfig.CR \
-				>> m_enemyConfig.SMIN \
-				>> m_enemyConfig.SMAX \
-				>> m_enemyConfig.OR \
-				>> m_enemyConfig.OG \
-				>> m_enemyConfig.OB \
-				>> m_enemyConfig.OT \
-				>> m_enemyConfig.VMIN \
-				>> m_enemyConfig.VMAX \
-				>> m_enemyConfig.L \
-				>> m_enemyConfig.SI;
+			conf >> m_enemyConfig.SR >> m_enemyConfig.CR >> m_enemyConfig.SMIN >> m_enemyConfig.SMAX >> m_enemyConfig.OR >> m_enemyConfig.OG >> m_enemyConfig.OB >> m_enemyConfig.OT >> m_enemyConfig.VMIN >> m_enemyConfig.VMAX >> m_enemyConfig.L >> m_enemyConfig.SI;
+			std::cout << "Enemy config read\n";
 		}
 		if (temp == "Bullet"){
-			conf >> m_bulletConfig.SR \
-				>> m_bulletConfig.CR \
-				>> m_bulletConfig.FR \
-				>> m_bulletConfig.FG \
-				>> m_bulletConfig.FB \
-				>> m_bulletConfig.OR \
-				>> m_bulletConfig.OG \
-				>> m_bulletConfig.OB \
-				>> m_bulletConfig.OT \
-				>> m_bulletConfig.V \
-				>> m_bulletConfig.L ;
+			conf >> m_bulletConfig.SR >> m_bulletConfig.CR >> m_bulletConfig.FR >> m_bulletConfig.FG >> m_bulletConfig.FB >> m_bulletConfig.OR >> m_bulletConfig.OG >> m_bulletConfig.OB >> m_bulletConfig.OT >> m_bulletConfig.V >> m_bulletConfig.L ;
+			std::cout << "Bullet config read\n";
 		}
 
 	}
@@ -74,6 +48,7 @@ void Game::init(const std::string& configPath){
 void Game::run(){
 	// add pause functionality here;;
 
+	std::cout << "SI = " << m_enemyConfig.SI << "\n";
 	 while (m_running){
 		 sLifeSpan();
 		 m_entityManager.removeDeadEntities();
@@ -100,9 +75,13 @@ void Game::setPaused(){
 void Game::spawnPlayer(){
 	auto entity = m_entityManager.addEntity(player);
 	// to be changed to load the propertied from config.
-	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
+	auto cx = m_window.getSize().x/2;
+	auto cy = m_window.getSize().y/2;
+
+	entity->cTransform = std::make_shared<CTransform>(Vec2(cx, cy), Vec2(0, 0), 0.0f);
 
 	entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.CR, sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB), sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB), m_playerConfig.OT);
+
 	entity->cInput = std::make_shared<CInput>();
 
 	m_player = entity; // Should not be allowed in ECS, but we are just doing it for some convinience.
@@ -112,13 +91,20 @@ void Game::spawnPlayer(){
 void Game::spawnEnemy(){
 	auto entity = m_entityManager.addEntity(enemy);
 
-	float ex = rand() % m_window.getSize().x;
-	float ey = rand() % m_window.getSize().y;
+	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
+
+	float ex, ey;
+	float minDistance = m_player->cShape->polygon.getRadius() + entity->cShape->polygon.getRadius() + 10;
+
+	do{
+		ex = rand() % m_window.getSize().x;
+		ey = rand() % m_window.getSize().y;
+	} while (Vec2(ex, ey).distance(m_player->cTransform->pos) <= minDistance);
+
 	float eAngle = rand() % 360;
 
 	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0, 0), eAngle);
 
-	entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 4.0f);
 	std::cout << "Enemy spawned at (" << ex << ", " << ey << ")\n";
 
 	m_lastEnemySpawnedTime = m_currentFrame;
@@ -132,7 +118,7 @@ void Game::spawnBullet(const Vec2 & mousePos){
 	auto b = m_entityManager.addEntity(bullet);
 	//b->cTransform->pos = m_player->cTransform->pos;
 	b->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, Vec2(0, 0), 0.0f);
-	b->cShape = std::make_shared<CShape>(16.0f, 9, sf::Color(123, 88, 34), sf::Color(255, 255, 255), 4.0f);
+	b->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V, sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
 
 	float speed = m_bulletConfig.S;
 
@@ -144,7 +130,7 @@ void Game::spawnBullet(const Vec2 & mousePos){
 	b->cTransform->velocity = {std::cos(theta), std::sin(theta)};
 	b->cTransform->velocity *= speed;
 
-	b->cLifeSpan = std::make_shared<CLifeSpan>(100);
+	b->cLifeSpan = std::make_shared<CLifeSpan>(m_bulletConfig.L);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
@@ -167,8 +153,9 @@ void Game::resetGame(){
 
 void Game::sEnemySpawner(){
 	// will decide when to spawn an enemy and call the spawnEnemy function to spawn the enemy.
-	size_t spawnInterval = 100; // Number of frames after to spawn an enemy, temparory var until SI implemented.
-	if (spawnInterval <= m_currentFrame - m_lastEnemySpawnedTime){
+	//size_t spawnInterval = 100; // Number of frames after to spawn an enemy, temparory var until SI implemented.
+	if (m_enemyConfig.SI <= m_currentFrame - m_lastEnemySpawnedTime){
+		std::cout << "frame : " << m_currentFrame << ", last enemy spawned on : " << m_lastEnemySpawnedTime << ", SI :" << m_enemyConfig.SI << "\n";
 		spawnEnemy();
 	}
 	/*
@@ -184,16 +171,16 @@ void Game::sMovement(){
 	m_player->cTransform->velocity.x = 0;
 
 	if (m_player->cInput->up){
-		m_player->cTransform->velocity.y = -5;
+		m_player->cTransform->velocity.y = -m_playerConfig.S;
 	}
 	if (m_player->cInput->down){
-		m_player->cTransform->velocity.y = 5;
+		m_player->cTransform->velocity.y = m_playerConfig.S;
 	}
 	if (m_player->cInput->left){
-		m_player->cTransform->velocity.x = -5;
+		m_player->cTransform->velocity.x = -m_playerConfig.S;
 	}
 	if (m_player->cInput->right){
-		m_player->cTransform->velocity.x = 5;
+		m_player->cTransform->velocity.x = m_playerConfig.S;
 	}
 
 	auto entities = m_entityManager.getEntities();
@@ -254,27 +241,27 @@ void Game::sUserInput(){
 		if (event.type == sf::Event::KeyPressed){
 			switch (event.key.code){
 				case sf::Keyboard::W:
-					std::cout << "W pressed\n";
+					//std::cout << "W pressed\n";
 					m_player->cInput->up = true;
 					break;
 				case sf::Keyboard::A:
-					std::cout << "A pressed\n";
+					//std::cout << "A pressed\n";
 					m_player->cInput->left = true;
 					break;
 				case sf::Keyboard::S:
-					std::cout << "S pressed\n";
+					//std::cout << "S pressed\n";
 					m_player->cInput->down = true;
 					break;
 				case sf::Keyboard::D:
-					std::cout << "D pressed\n";
+					//std::cout << "D pressed\n";
 					m_player->cInput->right = true;
 					break;
 				case sf::Keyboard::K:
-					std::cout << "K pressed\n";
+					//std::cout << "K pressed\n";
 					m_player->cInput->shoot = true;
 					break;
 				case sf::Keyboard::J:
-					std::cout << "J pressed\n";
+					//std::cout << "J pressed\n";
 					m_player->cInput->special = true;
 					break;
 			}
@@ -283,27 +270,27 @@ void Game::sUserInput(){
 		if (event.type == sf::Event::KeyReleased){
 			switch (event.key.code){
 				case sf::Keyboard::W:
-					std::cout << "W released\n";
+					//std::cout << "W released\n";
 					m_player->cInput->up = false;
 					break;
 				case sf::Keyboard::A:
-					std::cout << "A released\n";
+					//std::cout << "A released\n";
 					m_player->cInput->left = false;
 					break;
 				case sf::Keyboard::S:
-					std::cout << "S released\n";
+					//std::cout << "S released\n";
 					m_player->cInput->down = false;
 					break;
 				case sf::Keyboard::D:
-					std::cout << "D released\n";
+					//std::cout << "D released\n";
 					m_player->cInput->right = false;
 					break;
 				case sf::Keyboard::K:
-					std::cout << "K released\n";
+					//std::cout << "K released\n";
 					m_player->cInput->shoot = false;
 					break;
 				case sf::Keyboard::J:
-					std::cout << "J released\n";
+					//std::cout << "J released\n";
 					m_player->cInput->special = false;
 					break;
 			}
@@ -316,11 +303,11 @@ void Game::sUserInput(){
 
 			switch (event.mouseButton.button){
 				case sf::Mouse::Left:
-					std::cout << "Mouse Left Clicked\n";
+					//std::cout << "Mouse Left Clicked\n";
 					m_player->cInput->shoot = true;
 					break;
 				case sf::Mouse::Right:
-					std::cout << "Mouse Right Clicked\n";
+					//std::cout << "Mouse Right Clicked\n";
 					m_player->cInput->special = true;
 					break;
 			}
@@ -329,11 +316,11 @@ void Game::sUserInput(){
 		if (event.type == sf::Event::MouseButtonReleased){
 			switch (event.mouseButton.button){
 				case sf::Mouse::Left:
-					std::cout << "Mouse Left Released\n";
+					//std::cout << "Mouse Left Released\n";
 					m_player->cInput->shoot = false;
 					break;
 				case sf::Mouse::Right:
-					std::cout << "Mouse Right Released\n";
+					//std::cout << "Mouse Right Released\n";
 					m_player->cInput->special = false;
 					break;
 			}
