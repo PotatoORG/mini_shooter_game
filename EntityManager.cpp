@@ -46,6 +46,4 @@ void EntityManager::removeDeadEntities(){
 			it++;
 		}
 	}
-	std::cout << "Number of entities left: " << m_entities.size() << "\n";
 }
-

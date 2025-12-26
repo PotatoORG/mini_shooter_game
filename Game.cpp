@@ -1,8 +1,9 @@
 #include <cmath>
+#include <iostream>
+#include <fstream>
 
 #include "Game.h"
 
-#include <iostream>
 
 Game::Game(const std::string& configPath){
 	init(configPath);
@@ -10,20 +11,73 @@ Game::Game(const std::string& configPath){
 
 void Game::init(const std::string& configPath){
 	// config reading to be done;
+	std::ifstream conf("./config.txt");
+	std::string temp;
 
-	m_window.create(sf::VideoMode(1280, 720), "Polygon Shoots Polygon");
-	m_window.setFramerateLimit(60);
+	while (conf >> temp){
+		if (temp == "Window"){
+			conf >> m_windowConfig.W >> m_windowConfig.H >> m_windowConfig.FL >> m_windowConfig.FS;
+		}
+		if (temp == "Font"){
+			conf >> m_fontConfig.F >> m_fontConfig.S >> m_fontConfig.R >> m_fontConfig.G >> m_fontConfig.B;
+		}
+		if (temp == "Player"){
+			conf >> m_playerConfig.SR \
+				>> m_playerConfig.CR \
+				>> m_playerConfig.S \
+				>> m_playerConfig.FR \
+				>> m_playerConfig.FG \
+				>> m_playerConfig.FB \
+				>> m_playerConfig.OR \
+				>> m_playerConfig.OG \
+				>> m_playerConfig.OB \
+				>> m_playerConfig.OT \
+				>> m_playerConfig.V;
+		}
+		if (temp == "Enemy"){
+			conf >> m_enemyConfig.SR \
+				>> m_enemyConfig.CR \
+				>> m_enemyConfig.SMIN \
+				>> m_enemyConfig.SMAX \
+				>> m_enemyConfig.OR \
+				>> m_enemyConfig.OG \
+				>> m_enemyConfig.OB \
+				>> m_enemyConfig.OT \
+				>> m_enemyConfig.VMIN \
+				>> m_enemyConfig.VMAX \
+				>> m_enemyConfig.L \
+				>> m_enemyConfig.SI;
+		}
+		if (temp == "Bullet"){
+			conf >> m_bulletConfig.SR \
+				>> m_bulletConfig.CR \
+				>> m_bulletConfig.FR \
+				>> m_bulletConfig.FG \
+				>> m_bulletConfig.FB \
+				>> m_bulletConfig.OR \
+				>> m_bulletConfig.OG \
+				>> m_bulletConfig.OB \
+				>> m_bulletConfig.OT \
+				>> m_bulletConfig.V \
+				>> m_bulletConfig.L ;
+		}
 
+	}
+
+	m_window.create(sf::VideoMode(m_windowConfig.W, m_windowConfig.H), "Polygon Shoots Polygon");
+	m_window.setFramerateLimit(m_windowConfig.FL);
+
+	m_bulletConfig.S = 10.0f;
 	spawnPlayer();
 };
 
 void Game::run(){
 	// add pause functionality here;;
-	//
+
 	 while (m_running){
-		 m_entityManager.update();
-		 m_entityManager.removeDeadEntities();
 		 sLifeSpan();
+		 m_entityManager.removeDeadEntities();
+		 m_entityManager.update();
 
 		 if (!m_paused){
 		 	sEnemySpawner();
@@ -39,7 +93,7 @@ void Game::run(){
 }
 
 void Game::setPaused(){
-	;
+	m_paused = true;
 }
 
 // initializes the player entity, its transform, shape;
@@ -48,7 +102,7 @@ void Game::spawnPlayer(){
 	// to be changed to load the propertied from config.
 	entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0f);
 
-	entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 255, 255), 4.0f);
+	entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.CR, sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB), sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB), m_playerConfig.OT);
 	entity->cInput = std::make_shared<CInput>();
 
 	m_player = entity; // Should not be allowed in ECS, but we are just doing it for some convinience.
@@ -80,7 +134,7 @@ void Game::spawnBullet(const Vec2 & mousePos){
 	b->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, Vec2(0, 0), 0.0f);
 	b->cShape = std::make_shared<CShape>(16.0f, 9, sf::Color(123, 88, 34), sf::Color(255, 255, 255), 4.0f);
 
-	float speed = 6.0f;
+	float speed = m_bulletConfig.S;
 
 	auto dy = mousePos.y - b->cTransform->pos.y;
 	auto dx = mousePos.x - b->cTransform->pos.x;
@@ -161,13 +215,30 @@ void Game::sAttack(){
 
 // This will detect player's collision with any enemy or bullet's collision with any enemy and call the required functions to proceed.
 void Game::sCollision(){
-	auto enemies = m_entityManager.getEntities(enemy);
 
+	auto enemies = m_entityManager.getEntities(enemy);
+	auto bullets = m_entityManager.getEntities(bullet);
+
+	float separation;
 	for (auto& enemy : enemies){
-		float separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
+
+		separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
+
 		if (separation <= (m_player->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
-			std::cout << "Player collision distance = " << separation << "\n";
 			resetGame(); // resets score, position of player and enemies
+			return;
+		}
+	}
+
+	enemies = m_entityManager.getEntities(enemy);
+
+	for (auto& bullet : bullets){
+		for (auto& enemy : enemies){
+			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
+			if (separation <= (bullet->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
+				bullet->destroy();
+				enemy->destroy();
+			}
 		}
 	}
 }

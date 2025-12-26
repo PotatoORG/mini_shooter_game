@@ -7,9 +7,11 @@
 #include "EntityManager.h"
 
 
-struct PlayerConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V; float S;};
-struct EnemyConfig{int SR, CR, OR, OG, OB, OT, VMIN, VMAX, SI; float SMIN, SMAX;};
-struct BulletConfig{int SR, CR, FR, FG, FB, OR, OG, OT, V, L; float S;};
+struct PlayerConfig{int SR, CR, FR, FG, FB, OR, OG, OB, OT, V; float S;};
+struct EnemyConfig{int SR, CR, OR, OG, OB, OT, VMIN, VMAX, SI, L; float SMIN, SMAX;};
+struct BulletConfig{int SR, CR, FR, FG, FB, OR, OG, OB, OT, V, L; float S;};
+struct FontConfig{int S, R, G, B; std::string F;};
+struct WindowConfig{int W, H, FL, FS;};
 
 class Game{
 	sf::RenderWindow m_window;
@@ -19,6 +21,9 @@ class Game{
 	PlayerConfig	 m_playerConfig;
 	EnemyConfig 	 m_enemyConfig;
 	BulletConfig 	 m_bulletConfig;
+	FontConfig		 m_fontConfig;
+	WindowConfig	 m_windowConfig;
+
 	int 			 m_score = 0;
 	int 			 m_lastEnemySpawnedTime = 0;
 	int 			 m_currentFrame = 0;
