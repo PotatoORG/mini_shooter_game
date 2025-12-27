@@ -135,7 +135,22 @@ void Game::spawnEnemy(){
 }
 
 void Game::spawnSmallEnemy(std::shared_ptr<Entity> entity){
-	;
+	// this will be both the number of small enemies and their point count.
+	int number = entity->cShape->polygon.getPointCount();
+
+	for (int i = 0; i < number; i++){
+		auto enemy = m_entityManager.addEntity(smallEnemy);
+
+		enemy->cLifeSpan = std::make_shared<CLifeSpan>(m_enemyConfig.L);
+
+		// magic number : speed of small enemies - 4
+		float speed = 4;
+		float theta = entity->cTransform->angle + i*(360/number);
+		Vec2 velocity = {std::cos(theta), std::sin(theta)};
+		velocity *= speed;
+		enemy->cTransform = std::make_shared<CTransform>(entity->cTransform->pos, velocity, 0.0f);
+		enemy->cShape = std::make_shared<CShape>(entity->cShape->polygon.getRadius(), number, entity->cShape->polygon.getFillColor(), entity->cShape->polygon.getOutlineColor(), m_enemyConfig.OT);
+	}
 }
 
 void Game::spawnBullet(const Vec2 & mousePos){
@@ -255,7 +270,10 @@ void Game::sCollision(){
 		for (auto& enemy : enemies){
 			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
 			if (separation <= (bullet->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
-				if (bullet->isAlive() && enemy->isAlive()) {m_score++;}
+				if (bullet->isAlive() && enemy->isAlive()){
+					spawnSmallEnemy(enemy);
+					m_score++;
+				}
 				bullet->destroy();
 				enemy->destroy();
 			}

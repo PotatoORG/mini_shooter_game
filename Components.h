@@ -6,11 +6,11 @@
 #ifndef ENUM_CTAG
 #define ENUM_CTAG
 enum CTag{
-	default_tag,
+	defaultTag,
 	bullet,
 	enemy,
 	player,
-	enemy_small,
+	smallEnemy,
 	text
 };
 #endif

@@ -2,7 +2,7 @@ CC = g++
 FLAGS = -O3
 INC_SFML_FLAG = -lsfml-system -lsfml-window -lsfml-graphics
 
-game : EntityManager.o Entity.o Vec2.o Game.o main.o
+game.out : EntityManager.o Entity.o Vec2.o Game.o main.o
 	${CC} $^ -o $@ ${INC_SFML_FLAG}
 
 EntityManager.o : EntityManager.cpp
@@ -21,4 +21,4 @@ main.o : main.cpp
 	${CC} ${FLAGS}  -c $^ -o $@
 
 clean :
-	rm -f *.o game
+	rm -f *.o game.out

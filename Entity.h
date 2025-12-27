@@ -6,7 +6,7 @@
 
 class Entity{
 	size_t m_id = 0;
-	CTag m_tag = default_tag;
+	CTag m_tag = defaultTag;
 	bool m_alive = true;
 public:
 	Entity(const size_t id, const CTag tag);
