@@ -51,7 +51,7 @@ void Game::init(const std::string& configPath){
 	m_resetText.setCharacterSize(m_fontConfig.S);
 
 	m_text.setString("Score -_- '");
-	m_pauseText.setString("Game paused. Press ESC to resume.");
+	m_pauseText.setString("Game paused. Press ESC or click to resume.");
 	m_resetText.setString("You Died without even playing?");
 
 	size_t margin = 10;
@@ -208,8 +208,8 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 }
 
 void Game::resetGame(){
-	m_player->cTransform->pos = {m_window.getSize().x/2, m_window.getSize().y/2};
-	m_resetText.setString("You died.\nYour Score : " + std::to_string(m_score));
+	m_player->cTransform->pos = {(float)m_window.getSize().x/2, (float)m_window.getSize().y/2};
+	m_resetText.setString("You died.\nYour Score : " + std::to_string(m_score) + "\npress Esc or click to play again");
 	m_died = true;
 	setPaused();
 	m_score = 0;
@@ -454,6 +454,9 @@ void Game::sUserInput(){
 				case sf::Mouse::Left:
 					//std::cout << "Mouse Left Clicked\n";
 					m_player->cInput->shoot = true;
+					if (m_paused){
+						setUnpaused();
+					}
 					break;
 				case sf::Mouse::Right:
 					//std::cout << "Mouse Right Clicked\n";
