@@ -192,6 +192,11 @@ void Game::resetGame(){
 		enemy->destroy();
 	}
 
+	auto& smallEnemies = m_entityManager.getEntities(smallEnemy);
+	for (auto& enemy : smallEnemies){
+		enemy->destroy();
+	}
+
 	auto& bullets = m_entityManager.getEntities(bullet);
 	for (auto& bullet : bullets){
 		bullet->destroy();
