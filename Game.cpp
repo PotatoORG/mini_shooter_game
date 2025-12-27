@@ -420,8 +420,8 @@ void Game::sUserInput(){
 		}
 
 		if (event.type == sf::Event::MouseButtonPressed){
-			m_player->cInput->aim.x = event.mouseButton.x;
-			m_player->cInput->aim.y = event.mouseButton.y;
+			//m_player->cInput->aim.x = event.mouseButton.x;
+			//m_player->cInput->aim.y = event.mouseButton.y;
 			//std::cout << "Clicked at (" << m_player->cInput->aim.x << ", " << event.mouseButton.y << ")\n";
 
 			switch (event.mouseButton.button){
@@ -450,6 +450,8 @@ void Game::sUserInput(){
 
 		}
 	}
+	m_player->cInput->aim.x = sf::Mouse::getPosition(m_window).x;
+	m_player->cInput->aim.y = sf::Mouse::getPosition(m_window).y;
 }
 
 void Game::sRender(){
