@@ -58,15 +58,15 @@ void Game::run(){
 
 	std::cout << "SI = " << m_enemyConfig.SI << "\n";
 	 while (m_running){
-		 sLifeSpan();
 		 m_entityManager.removeDeadEntities();
 		 m_entityManager.update();
 
 		 if (!m_paused){
-		 	sEnemySpawner();
-			sMovement();
-			sAttack();
-			sCollision();
+			 sLifeSpan();
+			 sEnemySpawner();
+			 sMovement();
+			 sAttack();
+			 sCollision();
 		 }
 
 		 sUserInput();
@@ -103,6 +103,8 @@ void Game::spawnPlayer(){
 
 	entity->cInput = std::make_shared<CInput>();
 
+	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
+
 	m_player = entity; // Should not be allowed in ECS, but we are just doing it for some convinience.
 }
 
@@ -118,6 +120,7 @@ void Game::spawnEnemy(){
 	float 	theta 		 = rand() % 360;
 
 	entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, vertices, fillColor, outlineColor, m_enemyConfig.OT);
+	entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR);
 
 	Vec2 velocity = {std::cos(theta), std::sin(theta)};
 	velocity *= speed;
@@ -199,7 +202,7 @@ void Game::sEnemySpawner(){
 	// will decide when to spawn an enemy and call the spawnEnemy function to spawn the enemy.
 	//size_t spawnInterval = 100; // Number of frames after to spawn an enemy, temparory var until SI implemented.
 	if (m_enemyConfig.SI <= m_currentFrame - m_lastEnemySpawnedTime){
-		std::cout << "frame : " << m_currentFrame << ", last enemy spawned on : " << m_lastEnemySpawnedTime << ", SI :" << m_enemyConfig.SI << "\n";
+		//std::cout << "frame : " << m_currentFrame << ", last enemy spawned on : " << m_lastEnemySpawnedTime << ", SI :" << m_enemyConfig.SI << "\n";
 		spawnEnemy();
 	}
 	/*
@@ -249,6 +252,7 @@ void Game::sAttack(){
 void Game::sCollision(){
 
 	auto enemies = m_entityManager.getEntities(enemy);
+	auto smallEnemies = m_entityManager.getEntities(smallEnemy);
 	auto bullets = m_entityManager.getEntities(bullet);
 
 	float separation;
@@ -264,7 +268,18 @@ void Game::sCollision(){
 		}
 	}
 
+	for (auto& enemy : smallEnemies){
+
+		separation = m_player->cTransform->pos.distance(enemy->cTransform->pos);
+
+		if (separation <= (m_player->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
+			resetGame(); // resets score, position of player and enemies
+			return;
+		}
+	}
+
 	enemies = m_entityManager.getEntities(enemy); // since reset_game function may cause vector to reallocate.
+	smallEnemies = m_entityManager.getEntities(smallEnemy);
 
 	// Bullet - enemy collision checker
 	for (auto& bullet : bullets){
@@ -274,6 +289,18 @@ void Game::sCollision(){
 				if (bullet->isAlive() && enemy->isAlive()){
 					spawnSmallEnemy(enemy);
 					m_score++;
+				}
+				bullet->destroy();
+				enemy->destroy();
+			}
+		}
+
+		for (auto& enemy : smallEnemies){
+			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
+			if (separation <= (bullet->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
+				if (bullet->isAlive() && enemy->isAlive()){
+					spawnSmallEnemy(enemy);
+					m_score += 2;
 				}
 				bullet->destroy();
 				enemy->destroy();
@@ -390,7 +417,7 @@ void Game::sUserInput(){
 		if (event.type == sf::Event::MouseButtonPressed){
 			m_player->cInput->aim.x = event.mouseButton.x;
 			m_player->cInput->aim.y = event.mouseButton.y;
-			std::cout << "Clicked at (" << m_player->cInput->aim.x << ", " << event.mouseButton.y << ")\n";
+			//std::cout << "Clicked at (" << m_player->cInput->aim.x << ", " << event.mouseButton.y << ")\n";
 
 			switch (event.mouseButton.button){
 				case sf::Mouse::Left:
@@ -430,9 +457,10 @@ void Game::sRender(){
 			color.a = 255*(e->cLifeSpan->remaining/e->cLifeSpan->initial);
 			e->cShape->polygon.setFillColor(color);
 		}
+
 		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
-		
 		e->cShape->polygon.setRotation(e->cTransform->angle);
+
 		m_window.draw(e->cShape->polygon);
 	}
 
