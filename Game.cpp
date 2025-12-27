@@ -44,10 +44,25 @@ void Game::init(const std::string& configPath){
 		std::exit(0);
 	}
 	m_text.setFont(m_font);
+	m_pauseText.setFont(m_font);
+	m_text.setCharacterSize(m_fontConfig.S);
+	m_pauseText.setCharacterSize(m_fontConfig.S);
 	m_text.setString("Score -_- '");
+	m_pauseText.setString("Game paused. Press ESC to resume.");
+
+	size_t margin = 10;
+
+	// Set position of score text
+	m_text.setPosition(margin, margin);
+
+	// Set position of pause text
+	auto textSizex = m_pauseText.getLocalBounds().getSize().x;
+	auto textSizey = m_pauseText.getLocalBounds().getSize().y;
+
 	m_window.create(sf::VideoMode(m_windowConfig.W, m_windowConfig.H), "Polygon Shoots Polygon");
 	m_window.setFramerateLimit(m_windowConfig.FL);
 
+	m_pauseText.setPosition((m_window.getSize().x - textSizex)/2 , (m_window.getSize().y - textSizey)/2);
 
 	m_bulletConfig.S = 10.0f;
 	spawnPlayer();
@@ -133,7 +148,7 @@ void Game::spawnEnemy(){
 
 	entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), velocity, theta);
 
-	std::cout << "Enemy spawned at (" << ex << ", " << ey << ")\n";
+	//std::cout << "Enemy spawned at (" << ex << ", " << ey << ")\n";
 	m_lastEnemySpawnedTime = m_currentFrame;
 }
 
@@ -459,6 +474,8 @@ void Game::sRender(){
 	auto entities = m_entityManager.getEntities();
 
 	for (auto& e : entities){
+
+		// Fading away lifetime entities
 		if (e->cLifeSpan){
 			sf::Color color = e->cShape->polygon.getFillColor();
 			color.a = 255*(e->cLifeSpan->remaining/e->cLifeSpan->initial);
@@ -477,7 +494,13 @@ void Game::sRender(){
 
 		m_window.draw(e->cShape->polygon);
 	}
+
+	// Player drawn on top.
 	m_window.draw(m_player->cShape->polygon);
+
+	if (m_paused){
+		m_window.draw(m_pauseText);
+	}
 
 	m_text.setString("Score : " + std::to_string(m_score));
 	m_window.draw(m_text);

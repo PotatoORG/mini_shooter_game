@@ -18,6 +18,7 @@ class Game{
 	EntityManager 	 m_entityManager;
 	sf::Font 		 m_font;
 	sf::Text 		 m_text;
+	sf::Text		 m_pauseText;
 	PlayerConfig	 m_playerConfig;
 	EnemyConfig 	 m_enemyConfig;
 	BulletConfig 	 m_bulletConfig;
