@@ -12,7 +12,7 @@ Game::Game(const std::string& configPath){
 
 void Game::init(const std::string& configPath){
 	// config reading to be done;
-	std::ifstream conf("./config.txt");
+	std::ifstream conf(configPath);
 	std::string temp;
 
 	while (conf >> temp){
@@ -250,7 +250,7 @@ void Game::sCollision(){
 		for (auto& enemy : enemies){
 			separation = bullet->cTransform->pos.distance(enemy->cTransform->pos);
 			if (separation <= (bullet->cShape->polygon.getRadius() + enemy->cShape->polygon.getRadius())){
-				m_score++;
+				if (bullet->isAlive() && enemy->isAlive()) {m_score++;}
 				bullet->destroy();
 				enemy->destroy();
 			}

@@ -19,7 +19,7 @@ int main(){
 	Vec2 v4 = {2.0, 1.4};
 	v4.print();
 
-	Game game("lol");
+	Game game("./config.txt");
 	game.run();
 
 
