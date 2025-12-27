@@ -477,6 +477,7 @@ void Game::sRender(){
 
 		m_window.draw(e->cShape->polygon);
 	}
+	m_window.draw(m_player->cShape->polygon);
 
 	m_text.setString("Score : " + std::to_string(m_score));
 	m_window.draw(m_text);
