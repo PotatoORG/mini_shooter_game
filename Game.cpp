@@ -463,6 +463,13 @@ void Game::sRender(){
 			sf::Color color = e->cShape->polygon.getFillColor();
 			color.a = 255*(e->cLifeSpan->remaining/e->cLifeSpan->initial);
 			e->cShape->polygon.setFillColor(color);
+
+			// Outline color starts to fade away when half of lifespan is remaining.
+			if (e->cLifeSpan->remaining < e->cLifeSpan->initial/2){
+				sf::Color color = e->cShape->polygon.getOutlineColor();
+				color.a = 2*255*(e->cLifeSpan->remaining/e->cLifeSpan->initial);
+				e->cShape->polygon.setOutlineColor(color);
+			}
 		}
 
 		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
