@@ -40,12 +40,12 @@ void EntityManager::removeDeadEntities(){
 			//auto entity = *it;
 
 			it = m_entities.erase(it);
-			std::cout << idToRemove << " Entity removed from the big vector\n";
+			//std::cout << idToRemove << " Entity removed from the big vector\n";
 
 			for (auto it2 = m_entityMap[entityTag].begin(); it2 != m_entityMap[entityTag].end();){
 				if ((*it2)->id() == idToRemove){
 					it2 = m_entityMap[entityTag].erase(it2);
-					std::cout << idToRemove << " Entity removed from the map vector\n";
+					//std::cout << idToRemove << " Entity removed from the map vector\n";
 				} else {
 					it2++;
 				}

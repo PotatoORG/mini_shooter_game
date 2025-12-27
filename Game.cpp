@@ -149,7 +149,8 @@ void Game::spawnSmallEnemy(std::shared_ptr<Entity> entity){
 		Vec2 velocity = {std::cos(theta), std::sin(theta)};
 		velocity *= speed;
 		enemy->cTransform = std::make_shared<CTransform>(entity->cTransform->pos, velocity, 0.0f);
-		enemy->cShape = std::make_shared<CShape>(entity->cShape->polygon.getRadius(), number, entity->cShape->polygon.getFillColor(), entity->cShape->polygon.getOutlineColor(), m_enemyConfig.OT);
+
+		enemy->cShape = std::make_shared<CShape>(entity->cShape->polygon.getRadius()/2, number, entity->cShape->polygon.getFillColor(), entity->cShape->polygon.getOutlineColor(), m_enemyConfig.OT);
 	}
 }
 
@@ -422,9 +423,14 @@ void Game::sUserInput(){
 void Game::sRender(){
 	m_window.clear();
 	auto entities = m_entityManager.getEntities();
-	for (auto& e : entities){
-		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
+	for (auto& e : entities){
+		if (e->cLifeSpan){
+			sf::Color color = e->cShape->polygon.getFillColor();
+			color.a = 255*(e->cLifeSpan->remaining/e->cLifeSpan->initial);
+			e->cShape->polygon.setFillColor(color);
+		}
+		e->cShape->polygon.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 		
 		e->cShape->polygon.setRotation(e->cTransform->angle);
 		m_window.draw(e->cShape->polygon);
@@ -437,10 +443,12 @@ void Game::sRender(){
 }
 
 void Game::sLifeSpan(){
-	auto bullets = m_entityManager.getEntities(bullet);
-	for (auto& bullet : bullets){
-		if(!bullet->cLifeSpan->remaining--){
-			bullet->destroy();
+	auto entities = m_entityManager.getEntities();
+	for (auto& entity : entities){
+		if(entity->cLifeSpan){
+			if (!entity->cLifeSpan->remaining--){
+				entity->destroy();
+			}
 		}
 	}
 }
