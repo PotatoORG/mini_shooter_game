@@ -34,6 +34,7 @@ class Game{
 
 	void init(const std::string& configPath);
 	void setPaused();
+	void setUnpaused();
 
 	void sMovement(); // System : Entity movement/position update;
 	void sUserInput();

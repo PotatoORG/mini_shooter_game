@@ -64,11 +64,12 @@ void Game::run(){
 
 		 if (!m_paused){
 		 	sEnemySpawner();
-			sUserInput();
 			sMovement();
 			sAttack();
 			sCollision();
 		 }
+
+		 sUserInput();
 		 sRender();
 
 		 m_currentFrame++;
@@ -77,6 +78,10 @@ void Game::run(){
 
 void Game::setPaused(){
 	m_paused = true;
+}
+
+void Game::setUnpaused(){
+	m_paused = false;
 }
 
 // initializes the player entity, its transform, shape;
@@ -323,6 +328,13 @@ void Game::sUserInput(){
 				case sf::Keyboard::J:
 					//std::cout << "J pressed\n";
 					m_player->cInput->special = true;
+					break;
+				case sf::Keyboard::Escape:
+					if (!m_paused){
+						setPaused();
+					} else {
+						setUnpaused();
+					}
 					break;
 			}
 		}
