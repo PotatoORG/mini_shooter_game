@@ -45,10 +45,14 @@ void Game::init(const std::string& configPath){
 	}
 	m_text.setFont(m_font);
 	m_pauseText.setFont(m_font);
+	m_resetText.setFont(m_font);
 	m_text.setCharacterSize(m_fontConfig.S);
 	m_pauseText.setCharacterSize(m_fontConfig.S);
+	m_resetText.setCharacterSize(m_fontConfig.S);
+
 	m_text.setString("Score -_- '");
 	m_pauseText.setString("Game paused. Press ESC to resume.");
+	m_resetText.setString("You Died without even playing?");
 
 	size_t margin = 10;
 
@@ -56,13 +60,16 @@ void Game::init(const std::string& configPath){
 	m_text.setPosition(margin, margin);
 
 	// Set position of pause text
-	auto textSizex = m_pauseText.getLocalBounds().getSize().x;
-	auto textSizey = m_pauseText.getLocalBounds().getSize().y;
+	//auto textSizex = m_pauseText.getLocalBounds().getSize().x;
+	//auto textSizey = m_pauseText.getLocalBounds().getSize().y;
+	auto textSizey = m_fontConfig.S;
+	auto textSizex = textSizey*(0.5)*(m_pauseText.getString().toAnsiString().length());
 
 	m_window.create(sf::VideoMode(m_windowConfig.W, m_windowConfig.H), "Polygon Shoots Polygon");
 	m_window.setFramerateLimit(m_windowConfig.FL);
 
 	m_pauseText.setPosition((m_window.getSize().x - textSizex)/2 , (m_window.getSize().y - textSizey)/2);
+	m_resetText.setPosition((m_window.getSize().x - textSizex)/2 , (m_window.getSize().y - textSizey)/2);
 
 	m_bulletConfig.S = 10.0f;
 	spawnPlayer();
@@ -97,6 +104,7 @@ void Game::setPaused(){
 
 void Game::setUnpaused(){
 	m_paused = false;
+	m_died = false;
 }
 
 // initializes the player entity, its transform, shape;
@@ -200,7 +208,10 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity){
 }
 
 void Game::resetGame(){
-	m_player->cTransform->pos = {200.0f, 200.0f};
+	m_player->cTransform->pos = {m_window.getSize().x/2, m_window.getSize().y/2};
+	m_resetText.setString("You died.\nYour Score : " + std::to_string(m_score));
+	m_died = true;
+	setPaused();
 	m_score = 0;
 	auto& enemies = m_entityManager.getEntities(enemy);
 	for (auto& enemy : enemies){
@@ -499,7 +510,11 @@ void Game::sRender(){
 	m_window.draw(m_player->cShape->polygon);
 
 	if (m_paused){
-		m_window.draw(m_pauseText);
+		if (!m_died){
+			m_window.draw(m_pauseText);
+		} else {
+			m_window.draw(m_resetText);
+		}
 	}
 
 	m_text.setString("Score : " + std::to_string(m_score));

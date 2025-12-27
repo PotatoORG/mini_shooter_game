@@ -8,7 +8,7 @@ game.out : EntityManager.o Entity.o Vec2.o Game.o main.o
 EntityManager.o : EntityManager.cpp
 	${CC} ${FLAGS}  -c $^ -o $@
 
-Entity.o : Entity.cpp
+Entity.o : Entity.cpp 
 	${CC} ${FLAGS}  -c $^ -o $@
 
 Vec2.o : Vec2.cpp

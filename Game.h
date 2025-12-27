@@ -19,6 +19,7 @@ class Game{
 	sf::Font 		 m_font;
 	sf::Text 		 m_text;
 	sf::Text		 m_pauseText;
+	sf::Text		 m_resetText;
 	PlayerConfig	 m_playerConfig;
 	EnemyConfig 	 m_enemyConfig;
 	BulletConfig 	 m_bulletConfig;
@@ -28,6 +29,7 @@ class Game{
 	int 			 m_score = 0;
 	int 			 m_lastEnemySpawnedTime = 0;
 	int 			 m_currentFrame = 0;
+	bool 			 m_died = false;
 	bool 			 m_paused = false;
 	bool 			 m_running = true;
 
